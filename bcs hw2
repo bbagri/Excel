@@ -1,0 +1,72 @@
+Sub StockData()
+
+Dim WS As Worksheet
+   For Each WS In ActiveWorkbook.Worksheets
+   WS.Activate
+       LastRow = WS.Cells(Rows.Count, 1).End(xlUp).row
+       
+       Dim TickerName As String
+       Dim YearlyChange As Double
+       Dim PercentChange As Double
+       Dim TotalStockVolume As Double
+       Dim OpenPrice As Double
+       Dim ClosePrice As Double
+       Dim volume As Double
+       volume = 0
+       Dim row As Double
+       row = 2
+       Dim column As Integer
+       column = 1
+       Dim i As Long
+       
+       Cells(1, "I").Value = "Ticker"
+       Cells(1, "J").Value = "Yearly Change"
+       Cells(1, "K").Value = "Percent Change"
+       Cells(1, "L").Value = "Total Stock Volume"
+       
+       
+       OpenPrice = Cells(2, column + 2).Value
+       
+       For i = 2 To LastRow
+           If Cells(i + 1, column).Value <> Cells(i, column).Value Then
+                   TickerName = Cells(i, column).Value
+                   Cells(row, column + 8).Value = TickerName
+                   ClosePrice = Cells(i, column + 5).Value
+                   
+                   Cells(row, column + 9).Value = YearlyChange
+                   YearlyChange = ClosePrice - OpenPrice
+                   
+                   If (OpenPrice = 0 And ClosePrice = 0) Then
+                       PercentChange = 0
+                   ElseIf (OpenPrice = 0 And ClosePrice <> 0) Then
+                       PercentChange = 1
+                   Else
+                       PercentChange = YearlyChange / OpenPrice
+                       Cells(row, column + 10).Value = PercentChange
+                       Cells(row, column + 10).NumberFormat = "0.00%"
+                   End If
+                   volume = volume + Cells(i, column + 6).Value
+                   Cells(row, column + 11).Value = volume
+                   
+                   volume = 0
+                   row = row + 1
+                   OpenPrice = Cells(i + 1, column + 2)
+                   
+               Else
+                   volume = volume + Cells(i, column + 6).Value
+               End If
+           Next i
+       
+           YCLastRow = WS.Cells(Rows.Count, column + 8).End(xlUp).row
+           
+           For j = 2 To YCLastRow
+               If (Cells(j, column + 9).Value > 0 Or Cells(j, column + 9).Value = 0) Then
+                   Cells(j, column + 9).Interior.ColorIndex = 10
+               ElseIf Cells(j, column + 9).Value < 0 Then
+                   Cells(j, column + 9).Interior.ColorIndex = 3
+               End If
+           Next j
+           
+       Next WS
+         
+End Sub
